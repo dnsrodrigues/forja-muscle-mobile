@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="FORJA">
+  <path d="M72 58 H104 V184 L72 200 Z" fill="#0a0a0a"></path>
+  <path d="M72 58 H192 L176 92 H72 Z" fill="#0a0a0a"></path>
+  <path d="M72 116 H160 L146 150 H72 Z" fill="#0a0a0a"></path>
+  <rect x="170" y="176" width="26" height="26" rx="7" fill="#0a0a0a"></rect>
+</svg>

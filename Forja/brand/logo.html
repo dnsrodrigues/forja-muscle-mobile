@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>FORJA · Marca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --accent:#d4ff3a; --bg:#08090a; --bg1:#101113; --text:#f5f5f3; --dim:#9a9a96;
+    --f-display:"Bebas Neue",sans-serif; --f-body:"Space Grotesk",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#1a1a1a;color:var(--text);font-family:var(--f-body);padding:48px;}
+  .sheet{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:28px;}
+  .head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:20px;}
+  .head h1{font-family:var(--f-display);font-size:54px;margin:0;letter-spacing:.02em;}
+  .eyebrow{font-family:var(--f-display);letter-spacing:.2em;color:var(--dim);font-size:13px;text-transform:uppercase;}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .card{background:var(--bg1);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px;}
+  .card .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);}
+  .frame{flex:1;min-height:200px;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+  .on-dark{background:var(--bg);} .on-light{background:#f5f5f0;} .on-accent{background:var(--accent);}
+  /* lockup */
+  .lockup{display:flex;align-items:center;gap:20px;}
+  .word{font-family:var(--f-display);font-size:96px;line-height:.8;letter-spacing:.01em;display:flex;align-items:baseline;}
+  .word .dot{color:var(--accent);}
+  .word.dark{color:#0a0a0a;}
+  .stack{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .tag{font-family:var(--f-display);letter-spacing:.34em;font-size:15px;color:var(--dim);text-transform:uppercase;}
+  .row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .swatch{display:flex;flex-direction:column;gap:6px;}
+  .chip{width:100%;height:60px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);}
+  .mono{font-family:var(--f-body);font-size:11px;color:var(--dim);}
+  .favrow{display:flex;align-items:flex-end;gap:22px;}
+  .favbox{display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .favbox span{font-size:10px;color:var(--dim);}
+  .barbox{display:flex;align-items:center;gap:10px;background:#2b2d30;border-radius:9px 9px 0 0;padding:8px 14px;width:260px;}
+  .barbox .t{font-size:12px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Identidade da marca</div>
+      <h1>FORJA<span style="color:var(--accent)">.</span></h1>
+    </div>
+    <div class="eyebrow">Forjado pelo esforço diário</div>
+  </div>
+
+  <!-- Mark on 3 backgrounds -->
+  <div class="grid">
+    <div class="card">
+      <div class="lbl">Símbolo · fundo escuro</div>
+      <div class="frame on-dark"><img id="m1" src="forja-mark.svg" width="150" height="150"/></div>
+    </div>
+    <div class="card">
+      <div class="lbl">Símbolo · fundo claro</div>
+      <div class="frame on-light"><img src="forja-mark.svg" width="150" height="150"/></div>
+    </div>
+    <div class="card">
+      <div class="lbl">Símbolo · monocromático</div>
+      <div class="frame on-dark"><img src="forja-mark-mono.svg" width="150" height="150"/></div>
+    </div>
+  </div>
+
+  <!-- Lockups -->
+  <div class="grid" style="grid-template-columns:2fr 1fr;">
+    <div class="card">
+      <div class="lbl">Lockup horizontal</div>
+      <div class="frame on-dark">
+        <div class="lockup">
+          <img src="forja-mark.svg" width="104" height="104"/>
+          <div class="word">FORJA<span class="dot">.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="lbl">Lockup vertical</div>
+      <div class="frame on-accent" style="padding:24px;">
+        <div class="stack">
+          <img src="forja-mark-mono-dark.svg" width="76" height="76"/>
+          <div class="word dark" style="font-size:50px;">FORJA<span style="color:#0a0a0a">.</span></div>
+          <div class="tag" style="color:rgba(0,0,0,.5)">Treino · Controle</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favicon / tab preview -->
+  <div class="card">
+    <div class="lbl">Favicon · aba do navegador</div>
+    <div class="favrow">
+      <div class="favbox"><img src="forja-mark.svg" width="64" height="64"/><span>64</span></div>
+      <div class="favbox"><img src="forja-mark.svg" width="32" height="32"/><span>32</span></div>
+      <div class="favbox"><img src="forja-mark.svg" width="16" height="16"/><span>16</span></div>
+      <div class="barbox">
+        <img src="forja-mark.svg" width="16" height="16"/>
+        <span class="t">Forja · Controle de Treino</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colors -->
+  <div class="card">
+    <div class="lbl">Cores da marca</div>
+    <div class="row">
+      <div class="swatch" style="width:150px;"><div class="chip" style="background:#d4ff3a;"></div><span class="mono">Lime · #D4FF3A</span></div>
+      <div class="swatch" style="width:150px;"><div class="chip" style="background:#08090a;"></div><span class="mono">Carvão · #08090A</span></div>
+      <div class="swatch" style="width:150px;"><div class="chip" style="background:#f5f5f3;"></div><span class="mono">Osso · #F5F5F3</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Dependências e builds do Flutter
+forja_app/.dart_tool/
+forja_app/build/
+forja_app/.flutter-plugins
+forja_app/.flutter-plugins-dependencies
+forja_app/android/.gradle/
+forja_app/ios/Pods/
+
+# Segredos
+*.env
+.env
+
+# Sistema
+.DS_Store
+Thumbs.db

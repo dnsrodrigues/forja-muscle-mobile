@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>FORJA Mobile · Telas</title>
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48"/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="mobile/mobile.css"/>
+
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+    html, body { background: #1a1a1a; min-height: 100vh; }
+    .dc-card { background: #0a0a0a; border-color: rgba(255,255,255,0.06) !important; }
+    /* phone artboards: rounded screen + clip */
+    .dc-card .scr, .dc-card .mob { border-radius: 0; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="primitives.jsx"></script>
+  <script type="text/babel" src="shader-backdrop.jsx"></script>
+  <script type="text/babel" src="mobile/shared.jsx"></script>
+  <script type="text/babel" src="mobile/screens-entry.jsx"></script>
+  <script type="text/babel" src="mobile/screens-browse.jsx"></script>
+  <script type="text/babel" src="mobile/screens-train.jsx"></script>
+  <script type="text/babel" src="mobile/screens-profile.jsx"></script>
+  <script type="text/babel" src="mobile/screens-extra.jsx"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+
+  <script type="text/babel">
+    const { DesignCanvas, DCSection, DCArtboard, applyTheme, THEMES } = window;
+    const {
+      Onboarding, LoginMobile,
+      DashHoje, SemanaMobile, BibliotecaMobile,
+      TreinoExec, DetalheExercicio, CronometroDescanso,
+      ProgressoMobile, PerfilMobile, MeusAlunos,
+      MontarTreino, Conquistas, Medidas, Configuracoes,
+    } = window;
+
+    const W = 390, H = 844;
+
+    function App() {
+      // Apply saved theme (shared with the web app via localStorage)
+      React.useEffect(() => {
+        try {
+          const id = localStorage.getItem('forja-theme') || 'lime';
+          const t = (THEMES || []).find(x => x.id === id);
+          if (t && applyTheme) applyTheme(t);
+        } catch {}
+      }, []);
+
+      return (
+        <DesignCanvas title="FORJA Mobile — Telas do app"
+                      subtitle="11 telas mobile (390×844) na identidade FORJA, prontas para virar referência do app Flutter. Bottom tab bar com botão central de treino. Aluno + Personal.">
+
+          <DCSection id="entrada" title="Entrada"
+                     subtitle="Primeiro contato: onboarding com o shader animado da marca e login/cadastro com seletor segmentado.">
+            <DCArtboard id="onb" label="Onboarding" width={W} height={H}><Onboarding/></DCArtboard>
+            <DCArtboard id="login" label="Login / Cadastro" width={W} height={H}><LoginMobile/></DCArtboard>
+          </DCSection>
+
+          <DCSection id="navegacao" title="Navegação principal"
+                     subtitle="As abas da tab bar: Hoje (dashboard), Semana e Biblioteca de exercícios.">
+            <DCArtboard id="hoje" label="Hoje · Dashboard" width={W} height={H}><DashHoje/></DCArtboard>
+            <DCArtboard id="semana" label="Semana" width={W} height={H}><SemanaMobile/></DCArtboard>
+            <DCArtboard id="biblio" label="Biblioteca" width={W} height={H}><BibliotecaMobile/></DCArtboard>
+          </DCSection>
+
+          <DCSection id="treino" title="Fluxo de treino"
+                     subtitle="O coração do app: executar a sessão série a série, ver o detalhe de um exercício e o cronômetro de descanso em foco total.">
+            <DCArtboard id="exec" label="Treino em Execução" width={W} height={H}><TreinoExec/></DCArtboard>
+            <DCArtboard id="detalhe" label="Detalhe do Exercício" width={W} height={H}><DetalheExercicio/></DCArtboard>
+            <DCArtboard id="cron" label="Cronômetro de Descanso" width={W} height={H}><CronometroDescanso/></DCArtboard>
+          </DCSection>
+
+          <DCSection id="conta" title="Progresso & Conta"
+                     subtitle="Acompanhamento de evolução com gráficos, perfil do aluno e a visão do Personal Trainer.">
+            <DCArtboard id="prog" label="Progresso" width={W} height={H}><ProgressoMobile/></DCArtboard>
+            <DCArtboard id="perfil" label="Perfil" width={W} height={H}><PerfilMobile/></DCArtboard>
+            <DCArtboard id="alunos" label="Meus Alunos · Personal" width={W} height={H}><MeusAlunos/></DCArtboard>
+          </DCSection>
+
+          <DCSection id="detalhes" title="Telas de detalhe & ajustes"
+                     subtitle="Montagem de treino do Personal, conquistas, medidas corporais e preferências (com o seletor de cor de acento nativo).">
+            <DCArtboard id="montar" label="Montar Treino · Personal" width={W} height={H}><MontarTreino/></DCArtboard>
+            <DCArtboard id="conquistas" label="Conquistas" width={W} height={H}><Conquistas/></DCArtboard>
+            <DCArtboard id="medidas" label="Medidas Corporais" width={W} height={H}><Medidas/></DCArtboard>
+            <DCArtboard id="config" label="Preferências / Tema" width={W} height={H}><Configuracoes/></DCArtboard>
+          </DCSection>
+
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>
