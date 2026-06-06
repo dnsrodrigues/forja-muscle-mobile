@@ -2,9 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/auth/auth_page.dart';
-import '../features/home/home_placeholder_page.dart';
+import '../features/library/library_stub_page.dart';
 import '../features/onboarding/onboarding_page.dart';
+import '../features/profile/profile_page.dart';
+import '../features/shell/shell_scaffold.dart';
 import '../features/splash/splash_page.dart';
+import '../features/today/today_page.dart';
+import '../features/week/week_page.dart';
 import '../services/onboarding_prefs.dart';
 import 'go_router_refresh_stream.dart';
 import 'redirect_logic.dart';
@@ -32,7 +36,7 @@ final currentUserEmailProvider = Provider<String?>(
   (ref) => Supabase.instance.client.auth.currentUser?.email,
 );
 
-/// O "porteiro": monta o GoRouter, reage a login/logout e aplica o redirect.
+/// O "porteiro": monta o GoRouter com ShellRoute para as 4 abas principais.
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
@@ -52,7 +56,24 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/', builder: (c, s) => const SplashPage()),
       GoRoute(path: '/onboarding', builder: (c, s) => const OnboardingPage()),
       GoRoute(path: '/auth', builder: (c, s) => const AuthPage()),
-      GoRoute(path: '/home', builder: (c, s) => const HomePlaceholderPage()),
+      ShellRoute(
+        builder: (context, state, child) {
+          final tabIndex = switch (state.uri.path) {
+            '/week' => 1,
+            '/library' => 2,
+            '/profile' => 3,
+            _ => 0, // /today e fallback
+          };
+          return ShellScaffold(tabIndex: tabIndex, child: child);
+        },
+        routes: [
+          GoRoute(path: '/today', builder: (c, s) => const TodayPage()),
+          GoRoute(path: '/week', builder: (c, s) => const WeekPage()),
+          GoRoute(
+              path: '/library', builder: (c, s) => const LibraryStubPage()),
+          GoRoute(path: '/profile', builder: (c, s) => const ProfilePage()),
+        ],
+      ),
     ],
   );
 });
