@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/supabase_config.dart';
-import 'router/app_router.dart';
+import 'router/auth_providers.dart';
+import 'services/onboarding_prefs.dart';
 import 'theme/accent_theme.dart';
 import 'theme/forja_theme.dart';
 
@@ -13,7 +14,15 @@ Future<void> main() async {
     url: SupabaseConfig.url,
     anonKey: SupabaseConfig.anonKey,
   );
-  runApp(const ProviderScope(child: ForjaApp()));
+  final onboardingSeen = await OnboardingPrefs.isSeen();
+  runApp(
+    ProviderScope(
+      overrides: [
+        initialOnboardingSeenProvider.overrideWithValue(onboardingSeen),
+      ],
+      child: const ForjaApp(),
+    ),
+  );
 }
 
 class ForjaApp extends ConsumerWidget {
@@ -22,11 +31,12 @@ class ForjaApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final accent = ref.watch(accentProvider);
+    final router = ref.watch(goRouterProvider);
     return MaterialApp.router(
       title: 'FORJA',
       debugShowCheckedModeBanner: false,
       theme: forjaTheme(accent),
-      routerConfig: appRouter,
+      routerConfig: router,
     );
   }
 }
