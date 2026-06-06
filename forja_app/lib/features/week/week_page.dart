@@ -82,7 +82,7 @@ class WeekPage extends ConsumerWidget {
                     : ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                         itemCount: workouts.length,
-                        separatorBuilder: (_, __) =>
+                        separatorBuilder: (_, _) =>
                             const SizedBox(height: 8),
                         itemBuilder: (context, i) =>
                             _buildDayCard(workouts[i], accent, context),

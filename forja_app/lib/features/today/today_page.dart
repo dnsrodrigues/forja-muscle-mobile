@@ -68,7 +68,7 @@ class TodayPage extends ConsumerWidget {
             // ── Hero card ─────────────────────────────────────────────────
             todayWorkoutAsync.when(
               loading: () => _buildHeroSkeleton(),
-              error: (_, __) => _buildHeroEmpty(),
+              error: (_, _) => _buildHeroEmpty(),
               data: (w) => w == null
                   ? _buildHeroEmpty()
                   : _buildHeroCard(w, accent, context),
@@ -80,7 +80,7 @@ class TodayPage extends ConsumerWidget {
               Expanded(
                 child: weekStreakAsync.when(
                   loading: () => const _SkeletonBox(height: 80),
-                  error: (_, __) =>
+                  error: (_, _) =>
                       const ForjaKpiTile(label: 'Streak', value: '–'),
                   data: (s) => ForjaKpiTile(
                       label: 'Streak', value: '$s', unit: 'dias'),
@@ -90,7 +90,7 @@ class TodayPage extends ConsumerWidget {
               Expanded(
                 child: weekVolumeAsync.when(
                   loading: () => const _SkeletonBox(height: 80),
-                  error: (_, __) =>
+                  error: (_, _) =>
                       const ForjaKpiTile(label: 'Vol. semana', value: '–'),
                   data: (v) => ForjaKpiTile(
                     label: 'Vol. semana',
@@ -105,7 +105,7 @@ class TodayPage extends ConsumerWidget {
             // ── Mini-semana ───────────────────────────────────────────────
             miniWeekAsync.when(
               loading: () => const _SkeletonBox(height: 90),
-              error: (_, __) => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
               data: (days) => days.isEmpty
                   ? const SizedBox.shrink()
                   : _buildMiniWeek(days, accent.accent),
@@ -114,7 +114,7 @@ class TodayPage extends ConsumerWidget {
             // ── Último PR ─────────────────────────────────────────────────
             lastPrAsync.when(
               loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
               data: (pr) => pr == null
                   ? const SizedBox.shrink()
                   : Padding(

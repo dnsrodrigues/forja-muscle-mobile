@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../router/auth_providers.dart';
 import '../../theme/accent_theme.dart';
 import '../../theme/forja_colors.dart';

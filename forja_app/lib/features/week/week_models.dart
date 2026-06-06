@@ -1,4 +1,4 @@
-/// Modelo de dado para a aba Semana.
+// Modelo de dado para a aba Semana.
 
 class WeekWorkout {
   final String dayAbbr; // 'SEG','TER','QUA','QUI','SEX','SÁB','DOM'

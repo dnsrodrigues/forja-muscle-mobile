@@ -1,4 +1,4 @@
-/// Modelos de dados para o Dashboard "Hoje" e mini-semana.
+// Modelos de dados para o Dashboard "Hoje" e mini-semana.
 
 class TodayWorkout {
   final String id;
