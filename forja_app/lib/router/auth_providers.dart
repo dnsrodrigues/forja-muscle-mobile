@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/onboarding_prefs.dart';
 
 /// Valor inicial da flag de onboarding, carregado no main() e injetado via override.
@@ -18,3 +19,8 @@ class OnboardingSeenNotifier extends Notifier<bool> {
 
 final onboardingSeenProvider =
     NotifierProvider<OnboardingSeenNotifier, bool>(OnboardingSeenNotifier.new);
+
+/// E-mail do usuário logado (ou null). Pode ser sobrescrito em testes.
+final currentUserEmailProvider = Provider<String?>(
+  (ref) => Supabase.instance.client.auth.currentUser?.email,
+);
