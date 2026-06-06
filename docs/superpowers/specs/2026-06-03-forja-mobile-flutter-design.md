@@ -168,7 +168,7 @@ A especificação visual detalhada de cada tela (medidas, cores, componentes) es
 | 0 — Ferramentas | ✅ Instalar Flutter SDK + Android Studio + emulador; `flutter doctor` ok |
 | 1 — Fundação | ✅ `flutter create`, tema FORJA, fontes, `go_router`, Riverpod, conexão `supabase_flutter`, git init |
 | 2 — Entrada | ✅ Onboarding + Login/Cadastro (Auth real) |
-| 3 — Hoje + Semana | Dashboard do dia, KPIs, mini-semana; lista da semana |
+| 3 — Hoje + Semana | ✅ Dashboard do dia, KPIs, mini-semana; lista da semana |
 | 4 — Exercícios | Biblioteca + busca/filtros + Detalhe |
 | 5 — Treino ⭐ | Execução + Cronômetro + **cofre local offline** + sincronização |
 | 6 — Progresso + Medidas | Gráficos `fl_chart`; peso/medidas (+ % gordura no backend) |
