@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forja_app/features/today/today_models.dart';
+import 'package:forja_app/features/today/today_providers.dart';
 
 void main() {
   group('TodayWorkout', () {
@@ -57,6 +58,57 @@ void main() {
       );
       expect(pr.exerciseName, 'Supino Reto');
       expect(pr.weightKg, 100);
+    });
+  });
+
+  group('dartWeekdayToPostgresDow', () {
+    test('segunda (1) → 1', () => expect(dartWeekdayToPostgresDow(1), 1));
+    test('terça (2) → 2', () => expect(dartWeekdayToPostgresDow(2), 2));
+    test('domingo (7) → 0', () => expect(dartWeekdayToPostgresDow(7), 0));
+    test('sábado (6) → 6', () => expect(dartWeekdayToPostgresDow(6), 6));
+  });
+
+  group('calculateStreak', () {
+    test('retorna 0 com lista vazia', () {
+      expect(calculateStreak([]), 0);
+    });
+
+    test('retorna 1 com apenas hoje', () {
+      final today = dateToStr(DateTime.now());
+      expect(calculateStreak([today]), 1);
+    });
+
+    test('conta 3 dias consecutivos incluindo hoje', () {
+      final now = DateTime.now();
+      final dates = [0, 1, 2]
+          .map((d) => dateToStr(now.subtract(Duration(days: d))))
+          .toList();
+      expect(calculateStreak(dates), 3);
+    });
+
+    test('quebra na lacuna', () {
+      final now = DateTime.now();
+      // hoje e anteontem, mas sem ontem → streak = 1
+      final dates = [
+        dateToStr(now),
+        dateToStr(now.subtract(const Duration(days: 2))),
+      ];
+      expect(calculateStreak(dates), 1);
+    });
+
+    test('conta de ontem se hoje não tem log', () {
+      final now = DateTime.now();
+      final dates = [
+        dateToStr(now.subtract(const Duration(days: 1))),
+        dateToStr(now.subtract(const Duration(days: 2))),
+      ];
+      expect(calculateStreak(dates), 2);
+    });
+  });
+
+  group('thisWeekMonday', () {
+    test('retorna uma segunda-feira', () {
+      expect(thisWeekMonday().weekday, DateTime.monday);
     });
   });
 }
