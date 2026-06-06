@@ -15,21 +15,25 @@ Widget _wrap() => ProviderScope(
 void main() {
   testWidgets('inicia em "Entrar" com botão ENTRAR', (tester) async {
     await tester.pumpWidget(_wrap());
-    await tester.pumpAndSettle();
+    await tester.pump(); // build
+    await tester.pump(const Duration(milliseconds: 400)); // advance past transitions
     expect(find.text('ENTRAR →'), findsOneWidget);
   });
 
   testWidgets('alternar para "Criar conta" muda o botão', (tester) async {
     await tester.pumpWidget(_wrap());
-    await tester.pumpAndSettle();
+    await tester.pump(); // build
+    await tester.pump(const Duration(milliseconds: 400)); // advance past transitions
     await tester.tap(find.text('CRIAR CONTA'));
-    await tester.pumpAndSettle();
+    await tester.pump(); // build
+    await tester.pump(const Duration(milliseconds: 400)); // advance past transitions
     expect(find.text('CRIAR CONTA →'), findsOneWidget);
   });
 
   testWidgets('submeter vazio mostra erros de validação', (tester) async {
     await tester.pumpWidget(_wrap());
-    await tester.pumpAndSettle();
+    await tester.pump(); // build
+    await tester.pump(const Duration(milliseconds: 400)); // advance past transitions
     await tester.tap(find.text('ENTRAR →'));
     await tester.pump();
     expect(find.text('Informe seu e-mail'), findsOneWidget);

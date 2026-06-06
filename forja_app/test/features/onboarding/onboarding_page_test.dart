@@ -15,7 +15,8 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(); // build
+    await tester.pump(const Duration(milliseconds: 400)); // advance past transitions
 
     expect(find.text('FORJA · 01 / 03'), findsOneWidget);
     expect(find.text('SÉRIE'), findsOneWidget);
@@ -32,12 +33,15 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(); // build
+    await tester.pump(const Duration(milliseconds: 400)); // advance past transitions
 
     await tester.tap(find.text('PRÓXIMO →'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.text('PRÓXIMO →'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('FORJA · 03 / 03'), findsOneWidget);
     expect(find.text('COMEÇAR →'), findsOneWidget);
