@@ -38,6 +38,7 @@ int calculateStreak(List<String> doneDateStrings) {
 // ─── Providers ────────────────────────────────────────────────────────────────
 
 /// Treino do dia atual (null se não há treino atribuído).
+/// Usa query plana, sem junções aninhadas.
 final todayWorkoutProvider = FutureProvider<TodayWorkout?>((ref) async {
   final client = Supabase.instance.client;
   if (client.auth.currentUser == null) return null;
@@ -45,52 +46,56 @@ final todayWorkoutProvider = FutureProvider<TodayWorkout?>((ref) async {
   final todayDow = dartWeekdayToPostgresDow(DateTime.now().weekday);
   final todayStr = dateToStr(DateTime.now());
 
-  // Buscar o workout do dia
-  final workoutData = await client
-      .from('workouts')
-      .select(
-          'id, name, workout_exercises(sets, load_kg, reps, exercise_library(muscle_group))')
-      .eq('day_of_week', todayDow)
-      .eq('is_active', true)
-      .maybeSingle();
+  try {
+    // Query simples: apenas colunas básicas
+    final workoutData = await client
+        .from('workouts')
+        .select('id, name')
+        .eq('day_of_week', todayDow)
+        .limit(1)
+        .maybeSingle();
 
-  if (workoutData == null) return null;
+    if (workoutData == null) return null;
 
-  // Verificar se já foi concluído hoje
-  final logData = await client
-      .from('workout_logs')
-      .select('id')
-      .eq('workout_id', workoutData['id'] as String)
-      .gte('started_at', todayStr)
-      .limit(1)
-      .maybeSingle();
+    // Verificar se já foi concluído hoje
+    bool isDone = false;
+    try {
+      final logData = await client
+          .from('workout_logs')
+          .select('id')
+          .eq('workout_id', workoutData['id'] as String)
+          .gte('started_at', todayStr)
+          .limit(1)
+          .maybeSingle();
+      isDone = logData != null;
+    } catch (_) {
+      // Se workout_logs não existir, assume não feito
+    }
 
-  final exercises = (workoutData['workout_exercises'] as List?) ?? [];
+    // Contar exercícios (query separada, sem aninhamento)
+    int exerciseCount = 0;
+    try {
+      final exercises = await client
+          .from('workout_exercises')
+          .select('id')
+          .eq('workout_id', workoutData['id'] as String);
+      exerciseCount = (exercises as List).length;
+    } catch (_) {
+      // Se workout_exercises não existir, usa 0
+    }
 
-  // Grupos musculares únicos (máx. 3)
-  final groups = <String>{};
-  for (final e in exercises) {
-    final mg = (e['exercise_library'] as Map?)?['muscle_group'] as String?;
-    if (mg != null && mg.isNotEmpty) groups.add(mg);
+    return TodayWorkout(
+      id: workoutData['id'] as String,
+      name: (workoutData['name'] as String? ?? '').toUpperCase(),
+      groups: [], // grupos musculares chegam depois quando schema for confirmado
+      exerciseCount: exerciseCount,
+      estimatedMinutes: exerciseCount * 8,
+      totalVolumeKg: 0,
+      isDone: isDone,
+    );
+  } catch (_) {
+    return null;
   }
-
-  // Volume estimado em kg (séries × reps × carga)
-  double volume = 0;
-  for (final e in exercises) {
-    volume += ((e['sets'] as int? ?? 0) *
-        (e['reps'] as int? ?? 0) *
-        ((e['load_kg'] as num?)?.toDouble() ?? 0));
-  }
-
-  return TodayWorkout(
-    id: workoutData['id'] as String,
-    name: (workoutData['name'] as String).toUpperCase(),
-    groups: groups.take(3).toList(),
-    exerciseCount: exercises.length,
-    estimatedMinutes: exercises.length * 8,
-    totalVolumeKg: volume,
-    isDone: logData != null,
-  );
 });
 
 /// Número de dias consecutivos de treino (streak).
@@ -98,17 +103,21 @@ final weekStreakProvider = FutureProvider<int>((ref) async {
   final client = Supabase.instance.client;
   if (client.auth.currentUser == null) return 0;
 
-  final cutoff = DateTime.now().subtract(const Duration(days: 60));
-  final logs = await client
-      .from('workout_logs')
-      .select('started_at')
-      .gte('started_at', cutoff.toIso8601String())
-      .order('started_at', ascending: false);
+  try {
+    final cutoff = DateTime.now().subtract(const Duration(days: 60));
+    final logs = await client
+        .from('workout_logs')
+        .select('started_at')
+        .gte('started_at', cutoff.toIso8601String())
+        .order('started_at', ascending: false);
 
-  final dates = (logs as List)
-      .map((l) => (l['started_at'] as String).substring(0, 10))
-      .toList();
-  return calculateStreak(dates);
+    final dates = (logs as List)
+        .map((l) => (l['started_at'] as String).substring(0, 10))
+        .toList();
+    return calculateStreak(dates);
+  } catch (_) {
+    return 0;
+  }
 });
 
 /// Volume total (kg) da semana atual (segunda a hoje).
@@ -116,17 +125,21 @@ final weekVolumeProvider = FutureProvider<double>((ref) async {
   final client = Supabase.instance.client;
   if (client.auth.currentUser == null) return 0;
 
-  final monday = thisWeekMonday();
-  final logs = await client
-      .from('workout_logs')
-      .select('total_volume_kg')
-      .gte('started_at', monday.toIso8601String());
+  try {
+    final monday = thisWeekMonday();
+    final logs = await client
+        .from('workout_logs')
+        .select('total_volume_kg')
+        .gte('started_at', monday.toIso8601String());
 
-  double total = 0;
-  for (final log in (logs as List)) {
-    total += ((log['total_volume_kg'] as num?)?.toDouble() ?? 0);
+    double total = 0;
+    for (final log in (logs as List)) {
+      total += ((log['total_volume_kg'] as num?)?.toDouble() ?? 0);
+    }
+    return total;
+  } catch (_) {
+    return 0;
   }
-  return total;
 });
 
 /// Lista de 7 WeekDay para a mini-semana (Seg a Dom da semana atual).
@@ -134,43 +147,55 @@ final miniWeekProvider = FutureProvider<List<WeekDay>>((ref) async {
   final client = Supabase.instance.client;
   if (client.auth.currentUser == null) return _emptyWeek();
 
-  final monday = thisWeekMonday();
-  final today = DateTime.now();
+  try {
+    final monday = thisWeekMonday();
+    final today = DateTime.now();
 
-  // Logs concluídos nesta semana
-  final logs = await client
-      .from('workout_logs')
-      .select('started_at')
-      .gte('started_at', monday.toIso8601String());
-  final doneDays = <String>{};
-  for (final log in (logs as List)) {
-    doneDays.add((log['started_at'] as String).substring(0, 10));
+    // Logs desta semana
+    List logsRaw = [];
+    try {
+      logsRaw = await client
+          .from('workout_logs')
+          .select('started_at')
+          .gte('started_at', monday.toIso8601String()) as List;
+    } catch (_) {}
+
+    final doneDays = <String>{};
+    for (final log in logsRaw) {
+      doneDays.add((log['started_at'] as String).substring(0, 10));
+    }
+
+    // Dias que têm treino (query simples, sem is_active)
+    List workoutsRaw = [];
+    try {
+      workoutsRaw = await client
+          .from('workouts')
+          .select('day_of_week') as List;
+    } catch (_) {}
+
+    final trainDays = <int>{};
+    for (final w in workoutsRaw) {
+      final dow = w['day_of_week'] as int?;
+      if (dow != null) trainDays.add(dow);
+    }
+
+    const abbrs = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
+    return List.generate(7, (i) {
+      final day = monday.add(Duration(days: i));
+      final dow = dartWeekdayToPostgresDow(day.weekday);
+      final dateStr = dateToStr(day);
+      final todayStr = dateToStr(today);
+      return WeekDay(
+        abbr: abbrs[i],
+        dayNumber: day.day,
+        isToday: dateStr == todayStr,
+        isRest: trainDays.isNotEmpty && !trainDays.contains(dow),
+        isDone: doneDays.contains(dateStr),
+      );
+    });
+  } catch (_) {
+    return _emptyWeek();
   }
-
-  // Quais dias têm treino atribuído
-  final workoutsData = await client
-      .from('workouts')
-      .select('day_of_week')
-      .eq('is_active', true);
-  final trainDays = <int>{};
-  for (final w in (workoutsData as List)) {
-    trainDays.add(w['day_of_week'] as int);
-  }
-
-  const abbrs = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
-  return List.generate(7, (i) {
-    final day = monday.add(Duration(days: i));
-    final dow = dartWeekdayToPostgresDow(day.weekday);
-    final dateStr = dateToStr(day);
-    final todayStr = dateToStr(today);
-    return WeekDay(
-      abbr: abbrs[i],
-      dayNumber: day.day,
-      isToday: dateStr == todayStr,
-      isRest: !trainDays.contains(dow),
-      isDone: doneDays.contains(dateStr),
-    );
-  });
 });
 
 List<WeekDay> _emptyWeek() {
@@ -193,21 +218,37 @@ final lastPrProvider = FutureProvider<LastPr?>((ref) async {
   final client = Supabase.instance.client;
   if (client.auth.currentUser == null) return null;
 
-  final data = await client
-      .from('exercise_logs')
-      .select('weight_kg, reps, done_at, exercise_library(name)')
-      .eq('is_pr', true)
-      .order('done_at', ascending: false)
-      .limit(1)
-      .maybeSingle();
+  try {
+    final data = await client
+        .from('exercise_logs')
+        .select('weight_kg, reps, done_at, exercise_id')
+        .eq('is_pr', true)
+        .order('done_at', ascending: false)
+        .limit(1)
+        .maybeSingle();
 
-  if (data == null) return null;
+    if (data == null) return null;
 
-  return LastPr(
-    exerciseName:
-        (data['exercise_library'] as Map?)?['name'] as String? ?? 'Exercício',
-    weightKg: (data['weight_kg'] as num).toDouble(),
-    reps: data['reps'] as int,
-    doneAt: DateTime.parse(data['done_at'] as String),
-  );
+    // Busca o nome do exercício separadamente
+    String exerciseName = 'Exercício';
+    try {
+      final exerciseData = await client
+          .from('exercise_library')
+          .select('name')
+          .eq('id', data['exercise_id'] as String)
+          .maybeSingle();
+      if (exerciseData != null) {
+        exerciseName = exerciseData['name'] as String? ?? 'Exercício';
+      }
+    } catch (_) {}
+
+    return LastPr(
+      exerciseName: exerciseName,
+      weightKg: (data['weight_kg'] as num).toDouble(),
+      reps: data['reps'] as int,
+      doneAt: DateTime.parse(data['done_at'] as String),
+    );
+  } catch (_) {
+    return null;
+  }
 });
