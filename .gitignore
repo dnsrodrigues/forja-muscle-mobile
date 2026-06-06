@@ -13,3 +13,11 @@ forja_app/ios/Pods/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Skills (instaladas localmente via npx skills)
+.agents/
+.claude/
+skills-lock.json
+
+# Logs temporários de execução
+*.log
